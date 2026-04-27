@@ -1,0 +1,360 @@
+/* ── WearableHUD — Mi Band 6 real-time overlay ─────────────────────── */
+
+.wearable-hud {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.wearable-hud > * {
+    pointer-events: auto;
+}
+
+/* ── Floating indicator button ─────────────────────────────────────── */
+
+.wearable-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-panel);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+    transition: all var(--transition-fast);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
+
+.wearable-indicator:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.wearable-indicator.connected {
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
+}
+
+.wearable-indicator .hr-badge {
+    font-weight: 700;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+}
+
+.wearable-indicator .status-icon {
+    opacity: 0.5;
+}
+
+/* ── Alert banner ──────────────────────────────────────────────────── */
+
+.alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.4;
+    max-width: 340px;
+    backdrop-filter: blur(12px);
+    border: 1px solid;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+}
+
+.alert-banner.priority-critical {
+    background: var(--color-danger-dim);
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
+.alert-banner.priority-high {
+    background: rgba(249, 115, 22, 0.14);
+    border-color: #f97316;
+    color: #f97316;
+}
+
+.alert-banner.priority-medium {
+    background: rgba(245, 158, 11, 0.14);
+    border-color: var(--color-warning);
+    color: var(--color-warning);
+}
+
+.alert-banner.priority-info {
+    background: rgba(var(--color-primary-rgb), 0.12);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+/* ── Expanded panel ────────────────────────────────────────────────── */
+
+.wearable-panel {
+    width: 320px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.2);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.status-label {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.status-label.disconnected { background: var(--bg-card); color: var(--text-muted); }
+.status-label.scanning     { background: var(--color-primary-dim); color: var(--color-primary); }
+.status-label.connecting   { background: rgba(245, 158, 11, 0.14); color: var(--color-warning); }
+.status-label.connected    { background: var(--color-secondary-dim); color: var(--color-secondary); }
+.status-label.streaming    { background: var(--color-secondary-dim); color: var(--color-secondary); }
+
+/* ── Panel sections ────────────────────────────────────────────────── */
+
+.panel-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.controls-row {
+    flex-direction: row;
+    gap: 6px;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────── */
+
+.hud-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex: 1;
+}
+
+.hud-btn:hover { border-color: var(--color-primary); color: var(--text-primary); }
+.hud-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.hud-btn.primary {
+    background: var(--color-primary-dim);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+.hud-btn.primary:hover { background: rgba(var(--color-primary-rgb), 0.22); }
+
+.hud-btn.warning {
+    background: rgba(245, 158, 11, 0.14);
+    border-color: var(--color-warning);
+    color: var(--color-warning);
+}
+
+.hud-btn.danger {
+    background: var(--color-danger-dim);
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+    flex: 0;
+    padding: 8px 10px;
+}
+
+.hud-btn.icon-btn {
+    flex: 0;
+    padding: 8px 10px;
+}
+.hud-btn.icon-btn.active {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+/* ── Device list ───────────────────────────────────────────────────── */
+
+.device-list {
+    max-height: 120px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.device-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: var(--bg-card);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--text-primary);
+}
+
+.device-item .rssi {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.scanning-hint {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 12px 0;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.6px;
+    outline: none;
+    box-sizing: border-box;
+}
+.auth-input:focus { border-color: var(--color-primary); }
+
+/* ── Live data cards ───────────────────────────────────────────────── */
+
+.live-data {
+    gap: 8px;
+}
+
+.data-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+/* Heart rate card */
+.hr-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hr-icon.pulsing {
+    animation: pulse-hr 1s ease-in-out infinite;
+}
+
+@keyframes pulse-hr {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+}
+
+.data-value {
+    font-size: 28px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.data-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-right: auto;
+}
+
+.zone-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 8px;
+}
+
+/* IMU card */
+.imu-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.imu-icon { color: var(--color-primary); flex-shrink: 0; }
+
+.imu-axes {
+    display: flex;
+    gap: 10px;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+    font-family: 'Courier New', monospace;
+}
+
+.imu-axes.gyro { color: var(--color-warning); opacity: 0.8; }
+
+/* Stats card */
+.stats-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+}
+
+.stat-label { color: var(--text-muted); }
+
+.stat-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.stat-value.tags {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.intensity-tag {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.intensity-tag.smash  { background: var(--color-danger-dim); color: var(--color-danger); }
+.intensity-tag.drive  { background: rgba(249, 115, 22, 0.14); color: #f97316; }
+.intensity-tag.clear  { background: var(--color-primary-dim); color: var(--color-primary); }
+.intensity-tag.tap    { background: var(--bg-dark); color: var(--text-muted); }

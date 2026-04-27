@@ -1,0 +1,64 @@
+/* Light Theme (Default) */
+:root {
+    /* Core Brand Colors */
+    --color-primary: #3b82f6;
+    --color-primary-rgb: 59, 130, 246;
+    --color-primary-dim: rgba(59, 130, 246, 0.15);
+    --color-secondary: #10b981;
+    --color-secondary-dim: rgba(16, 185, 129, 0.15);
+    --color-danger: #ef4444;
+    --color-danger-dim: rgba(239, 68, 68, 0.15);
+    --color-warning: #f59e0b;
+
+    /* Backgrounds */
+    --bg-dark: #f8fafc;
+    --bg-panel: #ffffff;
+    --bg-card: #f1f5f9;
+
+    /* Text */
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+
+    /* UI Elements */
+    --border-color: #e2e8f0;
+    --border-active: var(--color-primary);
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+
+    /* Animations */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+}
+
+/* Dark Theme (Original Cyberpunk Style) */
+:root[data-theme="dark"] {
+    /* Core Brand Colors */
+    --color-primary: #00f3ff;
+    --color-primary-rgb: 0, 243, 255;
+    --color-primary-dim: rgba(0, 243, 255, 0.15);
+    --color-secondary: #10b981;
+    --color-secondary-dim: rgba(16, 185, 129, 0.15);
+    --color-danger: #ff6b6b;
+    --color-danger-dim: rgba(255, 107, 107, 0.15);
+    --color-warning: #f59e0b;
+
+    /* Backgrounds */
+    --bg-dark: #080a0f;
+    --bg-panel: #0f121a;
+    --bg-card: #131722;
+
+    /* Text */
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    /* UI Elements */
+    --border-color: rgba(0, 243, 255, 0.2);
+    --border-active: var(--color-primary);
+}

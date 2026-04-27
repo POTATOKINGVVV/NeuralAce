@@ -1,0 +1,26 @@
+__pycache__/
+node_modules/
+venv/
+.venv/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+android/.gradle/
+android/app/build/
+android/local.properties
+android/captitor/
+*.log
+.DS_Store
+icon.png
+icon.svg
+
+# Model weights
+*.pt
+*.pth
+*.onnx

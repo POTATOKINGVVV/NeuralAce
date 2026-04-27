@@ -1,0 +1,152 @@
+.library-container {
+    padding: 20px;
+    background: var(--bg-dark);
+    min-height: 100%;
+}
+
+.library-header {
+    position: sticky;
+    top: 0;
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    z-index: 10;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.library-header h2 {
+    margin-bottom: 15px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.filter-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.filter-scroll button {
+    white-space: nowrap;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.filter-scroll button.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+}
+
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.video-card {
+    background: var(--bg-panel);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.video-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.video-thumbnail {
+    aspect-ratio: 16/9;
+    background: var(--bg-card);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.play-overlay {
+    color: var(--text-primary);
+    opacity: 0.7;
+}
+
+.duration {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 2px 4px;
+    font-size: 0.6rem;
+    border-radius: 4px;
+    color: white;
+}
+
+.video-info {
+    padding: 10px;
+}
+
+.video-date {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.video-tags {
+    display: flex;
+    gap: 5px;
+}
+
+.tag {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+}
+
+.tag.WIN {
+    background: var(--color-secondary-dim);
+    color: var(--color-secondary);
+}
+
+.tag.LOSS {
+    background: var(--bg-card);
+    color: var(--text-secondary);
+}
+
+.tag.type {
+    border: 1px solid var(--border-color);
+    font-weight: normal;
+    color: var(--text-secondary);
+}
+
+.thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.9;
+}
+
+.video-card:hover .thumb-img {
+    opacity: 1;
+}
+
+.thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, var(--bg-card), var(--bg-dark));
+}

@@ -1,0 +1,41 @@
+{
+  "singles|Extended Rally|neutral|out_of_bounds": {
+    "wins": 0,
+    "losses": 0,
+    "preferred_tactics": {
+      "TT006": 2
+    }
+  },
+  "singles|Control Rally|neutral|rear_channel": {
+    "wins": 0,
+    "losses": 4,
+    "preferred_tactics": {
+      "T002": 3,
+      "T005": 1
+    }
+  },
+  "doubles|Extended Rally|neutral|out_of_bounds": {
+    "wins": 0,
+    "losses": 0,
+    "preferred_tactics": {
+      "TT008": 3,
+      "TT001": 1,
+      "TT003": 1,
+      "TT006": 1
+    }
+  },
+  "doubles|Control Rally|neutral|rear_channel": {
+    "wins": 0,
+    "losses": 3,
+    "preferred_tactics": {
+      "T010": 3
+    }
+  },
+  "doubles|Power Smash|under_pressure|front_channel": {
+    "wins": 1,
+    "losses": 0,
+    "preferred_tactics": {
+      "T001": 1
+    }
+  }
+}
