@@ -24,3 +24,14 @@ icon.svg
 *.pt
 *.pth
 *.onnx
+
+# ChromaDB local data
+backend/db/chroma_store/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Temp uploads
+backend/temp_uploads/

@@ -49,6 +49,13 @@
 - 支持基础视频分析流程复用
 - 为后续多球类运动扩展预留接口
 
+### 亮暗色主题切换
+
+- 支持浅色与深色两种主题模式
+- 深色模式采用赛博朋克风格，适合暗光环境与沉浸式展示
+- 浅色模式采用简洁明亮风格，适合日常训练与户外使用
+- 在个人设置页一键切换，全局即时生效
+
 ---
 
 ## 系统流程
@@ -80,6 +87,7 @@ AI 教练建议与前端 HUD 展示
 - 分析进度展示
 - 回合结果、球速、落点、战术建议与诊断信息展示
 - 手环物联网指挥舱展示
+- 语音播报与音效反馈
 
 ### 物联网指挥舱
 
@@ -102,6 +110,13 @@ AI 教练建议与前端 HUD 展示
 - 保存分析过的训练片段
 - 支持按胜负或动作类型筛选
 - 支持视频回看与复盘
+
+### 个人设置页
+
+- 亮色 / 深色主题切换
+- HUD 调试模式开关
+- 增强演示数据加载
+- 本地数据管理
 
 ---
 
@@ -157,6 +172,8 @@ pip install -r requirements.txt
 python main.py
 ```
 
+> **LLM 配置**：AI 教练功能依赖 LLM API，需在 `backend/` 目录下创建 `.env` 文件（参考 `.env.example`）配置 `LLM_API_KEY`、`LLM_BASE_URL` 和 `LLM_MODEL_NAME`。若未配置，AI 教练将使用默认回退逻辑。
+
 后端默认运行在：
 
 ```text
@@ -167,10 +184,18 @@ http://localhost:8000
 
 将模型权重放入 `backend/checkpoints/`：
 
+羽毛球分析模型：
+
 ```text
-TrackNet_best.pt
-InpaintNet_best.pt
-yolov8n-pose.pt
+TrackNet_best.pt          # 羽毛球轨迹识别
+InpaintNet_best.pt        # 轨迹修复网络
+yolov8n-pose.pt           # 姿态估计
+```
+
+乒乓球分析模型：
+
+```text
+tracknetv2_midpoint_best.pt   # 乒乓球轨迹识别
 ```
 
 ### 3. 启动前端
@@ -193,6 +218,10 @@ npm run build
 npx cap sync
 npx cap open android
 ```
+
+在 Android Studio 中选择目标设备并点击 Run 安装到手机。
+
+> **手机端测试注意**：手机需与电脑在同一局域网，且后端地址需使用电脑的局域网 IP（而非 `localhost`）。详见下方运行注意事项。
 
 ---
 
@@ -284,17 +313,26 @@ NeuralAce/
 
 <table align="center">
   <tr>
-    <td align="center" width="25%">
-      <img src="assets/pic/ui演示1.png" alt="赛场分析界面" width="100%" />
+    <td align="center" width="14%">
+      <img src="assets/pic/ui演示1.jpg" alt="赛场分析界面" width="100%" />
     </td>
-    <td align="center" width="25%">
-      <img src="assets/pic/ui演示2.png" alt="训练状态界面" width="100%" />
+    <td align="center" width="14%">
+      <img src="assets/pic/ui演示2.jpg" alt="训练状态界面" width="100%" />
     </td>
-    <td align="center" width="25%">
-      <img src="assets/pic/ui演示3.png" alt="战术分析界面" width="100%" />
+    <td align="center" width="14%">
+      <img src="assets/pic/ui演示3.jpg" alt="战术分析界面" width="100%" />
     </td>
-    <td align="center" width="25%">
-      <img src="assets/pic/ui演示4.png" alt="回放复盘界面" width="100%" />
+    <td align="center" width="14%">
+      <img src="assets/pic/ui演示4.jpg" alt="回放复盘界面" width="100%" />
+    </td>
+    <td align="center" width="14%">
+      <img src="assets/pic/ui演示5.jpg" alt="物联网指挥舱" width="100%" />
+    </td>
+    <td align="center" width="14%">
+      <img src="assets/pic/ui演示6.jpg" alt="进化分析界面" width="100%" />
+    </td>
+    <td align="center" width="14%">
+      <img src="assets/pic/ui演示7.jpg" alt="个人设置界面" width="100%" />
     </td>
   </tr>
 </table>
@@ -357,18 +395,27 @@ AI 教练综合反馈
 
 ## 运行注意事项
 
-- 后端服务默认运行在 `http://localhost:8000`
+- 后端服务默认运行在 `http://localhost:8000`（绑定 `0.0.0.0`，可被局域网访问）
 - 前端开发服务默认运行在 `http://localhost:5173`
-- 视频分析依赖模型权重文件，请确认 `backend/checkpoints/` 下已放置对应模型
+- 视频分析依赖模型权重文件，请确认 `backend/checkpoints/` 下已放置对应模型（羽毛球 + 乒乓球）
 - 摄像头录制功能需要浏览器授权摄像头权限
 - Android 端需要先执行 `npm run build` 和 `npx cap sync`
 - 手环物联网功能需要设备连接和数据通道正常工作
 - 如果只进行界面演示，可使用增强演示模式展示物联网状态变化
+- 语音播报功能使用浏览器 Web Speech API，需浏览器支持
+
+### 手机端测试额外要求
+
+- 手机与电脑必须在同一局域网下
+- 前端 API 地址需从 `localhost` 改为电脑的局域网 IP（如 `http://192.168.x.x:8000`）
+- Android 端已配置 `usesCleartextTraffic` 和 Capacitor `server.cleartext` 以允许 HTTP 明文请求
+- Windows 防火墙需放行后端端口（默认 8000）的入站 TCP 连接
+- 修改前端地址后需重新执行 `npm run build` + `npx cap sync` 并重装应用
 
 ---
 
 ## 项目定位
 
-本项目不是单一的视频识别 Demo，而是面向羽毛球训练场景构建的多模态智能分析系统。它将比赛画面、球路变化、身体状态、战术建议和移动端交互整合在一起，让训练过程从“看见结果”进一步升级为“理解过程、感知状态、辅助决策”。
+本项目不是单一的视频识别 Demo，而是面向羽毛球、乒乓球等多球类训练场景构建的多模态物联网智能分析系统。它将比赛画面、球路变化、身体状态、战术建议、物联网终端和移动端交互整合在一起，让训练过程从“看见结果”进一步升级为“理解过程、感知状态、辅助决策”。
 
 乒乓球能力作为轻量扩展模块保留在系统中，用于展示平台的多运动迁移潜力；羽毛球分析与手环物联网融合则是当前项目的核心展示方向。
