@@ -3,34 +3,34 @@ export const mockAnalyzeRally = (file, matchType) => {
         setTimeout(() => {
             resolve({
                 physics: {
-                    event: 'Smash',
+                    event: '重力杀球',
                     max_speed_kmh: 214.5,
-                    description: `Mode: ${matchType === 'doubles' ? 'Doubles' : 'Singles'}. Opponent applied heavy pressure. [Motion: stance too upright]`,
+                    description: `模式: ${matchType === 'doubles' ? '双打' : '单打'}。对手施加强烈压力。 [动作: 站姿过于竗直]`,
                 },
                 advice: {
-                    text: 'Lower your base on contact. A soft backhand block to the front court is the highest-value reply.',
+                    text: '触球时降低重心。轻柔的反手挡网是最高价值的应对。',
                 },
                 auto_result: 'WIN',
                 auto_reward: 10.0,
                 session_id: 'T001',
                 tactics: [
                     {
-                        name: 'Counter Block',
-                        content: 'Use a soft backhand block to pull the attacker forward.',
+                        name: '反手挡网',
+                        content: '用轻柔的反手挡网将进攻者拉向前场。',
                         metadata: {
                             tactic_id: 'T001',
-                            name: 'Counter Block',
+                            name: '反手挡网',
                             alpha: 5.0,
                             beta: 1.0,
                         },
                         score: 0.85,
                     },
                     {
-                        name: 'Deep Lift Reset',
-                        content: 'Lift high and deep to the baseline to recover court balance.',
+                        name: '高远球重置',
+                        content: '将球挑高打深至底线以恢复场地平衡。',
                         metadata: {
                             tactic_id: 'T002',
-                            name: 'Deep Lift Reset',
+                            name: '高远球重置',
                             alpha: 2.0,
                             beta: 3.0,
                         },

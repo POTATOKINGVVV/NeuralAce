@@ -56,12 +56,12 @@ const normalizeAutoResult = (result) => {
 };
 
 const getQualityLabel = (quality) => {
-    if (quality === 'high') return 'HIGH';
-    if (quality === 'medium') return 'MEDIUM';
-    if (quality === 'low') return 'LOW';
-    if (quality === 'warming') return 'WARMING';
-    if (quality === 'offline') return 'OFFLINE';
-    return String(quality || 'UNKNOWN').toUpperCase();
+    if (quality === 'high') return '高';
+    if (quality === 'medium') return '中';
+    if (quality === 'low') return '低';
+    if (quality === 'warming') return '预热中';
+    if (quality === 'offline') return '离线';
+    return String(quality || '未知').toUpperCase();
 };
 
 const formatGyroAxis = (value) => {
@@ -88,12 +88,80 @@ const getRiskLabel = (label) => {
     return '对抗稳定';
 };
 
+const SIGNAL_LABEL_MAP = {
+    'absorb-and-redirect': '吸收反击',
+    'reset-and-rebuild': '重置重建',
+    'front-court-trap': '前场陷阱',
+    'attritional-pressure': '消耗压力',
+    'compression-attack': '压缩进攻',
+    'deception': '假动作',
+    'interception': '截击',
+    'managed-pressure': '控制压力',
+    'topspin-attack': '上旋进攻',
+    'short-game': '短球',
+    'serve-variation': '发球变化',
+    'balanced': '均衡',
+    'control': '控制',
+    'attack': '进攻',
+    'defense': '防守',
+    'surging': '上升势头',
+    'neutral': '中性',
+    'under-pressure': '被动',
+    'releasing-pressure': '压力释放',
+    'increasing': '上升',
+    'steady': '平稳',
+    'weaponize': '武器化',
+    'refine': '精炼',
+    'probe': '探索',
+    'stabilize': '稳固',
+    'first-two-shots': '前两拍',
+    'fourth-ball': '第四板',
+    'opening': '开局',
+    'turn': '转折',
+    'adapt': '适应',
+    'closing': '收官',
+    'duel': '对抗',
+    'topspin-loop': '弧圈球',
+    'direct-pressure': '直接施压',
+    'soft-control': '轻柔控制',
+    'flat-drive': '平抽',
+    'releasing-pressure-streak': '压力释放连胜',
+    'surging-streak': '上升连胜',
+    'adaptation-live': '适应进行中',
+    'spin-rally': '旋转相持',
+    'control-phase': '控制阶段',
+    'rear_channel': '后场通道',
+    'front_channel': '前场通道',
+    'mid_channel': '中场通道',
+    'A_deep_wide': 'A侧深远',
+    'B_deep_wide': 'B侧深远',
+    'center': '中心',
+    'unknown': '未知',
+    'advantage': '优势',
+    'under_pressure': '被动',
+    'transition': '过渡',
+    'exploit': '利用',
+    'balanced': '均衡',
+    'strong': '强',
+    'medium': '中',
+    'low': '低',
+    'high': '高',
+    'fast': '快',
+    'slow': '慢',
+    'clean': '干净',
+};
+
 const formatSignalLabel = (value) => {
     if (!value) {
-        return 'Unknown';
+        return '未知';
     }
 
-    return String(value)
+    const key = String(value);
+    if (SIGNAL_LABEL_MAP[key]) {
+        return SIGNAL_LABEL_MAP[key];
+    }
+
+    return key
         .split(/[_-]/)
         .filter(Boolean)
         .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
@@ -666,7 +734,7 @@ const Arena = () => {
                                 <div className="iot-gyro-panel">
                                     <div className="iot-gyro-header">
                                         <Activity size={13} />
-                                        陀螺仪（手机 IMU）
+                                        陀螺仪
                                     </div>
                                     <div className={`iot-gyro-grid ${hasGyroData ? 'online' : 'offline'}`}>
                                         <div>

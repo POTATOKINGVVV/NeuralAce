@@ -45,7 +45,8 @@ class ConfidenceCalibrator:
         return "low"
 
     def _summary(self, confidence: float, volatility: float, caution_level: str) -> str:
+        level_label = {"high": "\u9ad8", "medium": "\u4e2d", "low": "\u4f4e"}.get(caution_level, caution_level)
         return (
-            f"Calibrated confidence is {confidence:.2f} with volatility {volatility:.2f}; "
-            f"recommended caution level is {caution_level}."
+            f"\u6821\u51c6\u7f6e\u4fe1\u5ea6 {confidence:.2f}\uff0c\u6ce2\u52a8\u6027 {volatility:.2f}\uff1b"
+            f"\u5efa\u8bae\u8b66\u60d5\u7ea7\u522b\u4e3a{level_label}\u3002"
         )

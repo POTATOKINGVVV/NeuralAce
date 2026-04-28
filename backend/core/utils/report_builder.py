@@ -13,11 +13,11 @@ class ReportBuilder:
         sequence_context = diagnostics.get("sequence_context", {})
         duel_projection = diagnostics.get("duel_projection", {})
         return {
-            "headline": summary.get("headline", "Rally analyzed"),
+            "headline": summary.get("headline", "回合已分析"),
             "verdict": summary.get("verdict", "UNKNOWN"),
-            "top_tactic": top_tactic.get("name", "Neutral reset") if top_tactic else "Neutral reset",
+            "top_tactic": top_tactic.get("name", "中性重置") if top_tactic else "中性重置",
             "technical_snapshot": {
-                "event": state.get("event", "Unknown"),
+                "event": state.get("event", "未知"),
                 "pressure_index": state.get("pressure_index", 0.0),
                 "attack_phase": state.get("attack_phase", "neutral"),
                 "tempo_profile": state.get("tempo_profile", "medium"),
@@ -43,7 +43,7 @@ class ReportBuilder:
                 "evolution_replay": top_tactic.get("evolution_replay", {}),
             },
             "training_plan": training_plan or {},
-            "coach_takeaway": summary.get("key_takeaway", "Focus on stable execution in the next exchange."),
+            "coach_takeaway": summary.get("key_takeaway", "专注下一次交换的稳定执行。"),
         }
 
     def build_match_report(self, intelligence: Dict, timeline: List[Dict], training_plan: Dict | None = None, sequence_context: Dict | None = None, duel_summary: Dict | None = None, replay_story: Dict | None = None) -> Dict:
@@ -54,8 +54,8 @@ class ReportBuilder:
         audit_distribution = Counter(audit_levels)
         return {
             "headline": self._headline(intelligence),
-            "dominant_pattern": intelligence.get("dominant_pattern", "Unknown"),
-            "tactical_identity": intelligence.get("tactical_identity", "Adaptive"),
+            "dominant_pattern": intelligence.get("dominant_pattern", "未知"),
+            "tactical_identity": intelligence.get("tactical_identity", "自适应"),
             "momentum_state": intelligence.get("momentum_state", "neutral"),
             "recommended_focus": intelligence.get("recommended_focus", []),
             "rally_count": len(timeline),
@@ -70,14 +70,15 @@ class ReportBuilder:
     def _headline(self, intelligence: Dict) -> str:
         momentum = intelligence.get("momentum_state", "neutral")
         if momentum == "surging":
-            return "Momentum favored your side across the match."
+            return "整场比赛势头偏向你这一方。"
         if momentum == "under-pressure":
-            return "The match trended toward reactive play under pressure."
-        return "The match showed a balanced tactical rhythm overall."
+            return "比赛趋势偏向被动应对。"
+        return "整场比赛呈现均衡的战术节奏。"
 
     def _narrative(self, intelligence: Dict) -> str:
-        dominant = intelligence.get("dominant_pattern", "Unknown")
-        identity = intelligence.get("tactical_identity", "Adaptive")
+        dominant = intelligence.get("dominant_pattern", "未知")
+        identity = intelligence.get("tactical_identity", "自适应")
         trend = intelligence.get("confidence_trend", "flat")
-        focus = ", ".join(intelligence.get("recommended_focus", [])[:2]) or "maintain-balanced-decision-making"
-        return f"The match was shaped primarily by {dominant} patterns, with {identity} emerging as the most visible tactical identity. Confidence trend remained {trend}, and the next training focus should prioritize {focus}."
+        trend_label = {"rising": "上升", "falling": "下降", "flat": "平稳"}.get(trend, "平稳")
+        focus = "、".join(intelligence.get("recommended_focus", [])[:2]) or "保持均衡决策"
+        return f"整场比赛主要围绕 {dominant} 模式展开，{identity} 是最突出的战术身份。置信度趋势保持{trend_label}，下一步训练应优先关注{focus}。"

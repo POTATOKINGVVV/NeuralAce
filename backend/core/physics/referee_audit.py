@@ -79,15 +79,15 @@ class RefereeAuditTrail:
         interpretation_stability = float(rally_quality.get("interpretation_stability", 0.5) or 0.5)
 
         if auto_result != "UNKNOWN" and float(confidence_report.get("calibrated_confidence", 0.5) or 0.5) < 0.34:
-            contradictions.append("A decisive verdict exists even though calibrated confidence remains low.")
+            contradictions.append("校准置信度仍然很低，但已给出明确判定。")
         if abs(landing_margin) < 0.08 and landing_confidence > 0.72:
-            contradictions.append("Landing margin is very small while landing confidence is unusually high.")
+            contradictions.append("落点边距非常小，但落点置信度异常高。")
         if direction_consistency < 0.38 and auto_result != "UNKNOWN":
-            contradictions.append("Last-hitter inference is weak for a resolved point outcome.")
+            contradictions.append("最后击球方推断较弱，但已给出得分结果。")
         if signal_integrity < 0.35 and interpretation_stability > 0.68:
-            contradictions.append("Tracker integrity is poor relative to the reported rally stability.")
+            contradictions.append("跟踪器信号完整性较差，但回合稳定性报告却较高。")
         if volatility > 0.62 and auto_result in {"WIN", "LOSS"}:
-            contradictions.append("Verdict volatility is high despite a binary win/loss call.")
+            contradictions.append("判定波动性较高，但给出了明确的胜/负结果。")
         return contradictions
 
     def _collect_support_signals(
@@ -99,15 +99,15 @@ class RefereeAuditTrail:
     ) -> List[str]:
         support_signals: List[str] = []
         if float(state.get("landing_confidence", 0.0) or 0.0) >= 0.62:
-            support_signals.append("Landing geometry remained strong enough to support the call.")
+            support_signals.append("落点几何足够强，支持当前判定。")
         if float(state.get("direction_consistency", 0.0) or 0.0) >= 0.62:
-            support_signals.append("Last-hitter direction inference was reasonably consistent.")
+            support_signals.append("最后击球方方向推断合理一致。")
         if float(tracker_diagnostics.get("signal_integrity", 0.0) or 0.0) >= 0.64:
-            support_signals.append("Tracker signal integrity stayed above the stable threshold.")
+            support_signals.append("跟踪器信号完整性超过稳定阈值。")
         if float(motion_profile.get("readiness_score", 0.0) or 0.0) >= 0.58:
-            support_signals.append("Motion readiness supported the physical interpretation of the exchange.")
+            support_signals.append("动作就绪度支持交换的物理解读。")
         if float(confidence_report.get("calibrated_confidence", 0.0) or 0.0) >= 0.66:
-            support_signals.append("Cross-module confidence stayed high after calibration.")
+            support_signals.append("跨模块置信度在校准后仍保持较高。")
         return support_signals
 
     def _audit_level(self, consistency_score: float, contradictions: List[str]) -> str:
@@ -118,16 +118,17 @@ class RefereeAuditTrail:
         return "clean"
 
     def _recommended_action(self, audit_level: str, state: Dict) -> str:
-        event_name = state.get("event", "rally")
+        event_name = state.get("event", "回合")
         if audit_level == "escalate":
-            return f"Treat the {event_name.lower()} verdict as provisional and favor conservative feedback wording."
+            return f"将 {event_name} 判定视为临时结果，建议采用保守的反馈用语。"
         if audit_level == "watch":
-            return f"Keep the {event_name.lower()} verdict, but surface a caution note to the player."
-        return f"The {event_name.lower()} verdict is stable enough to use as a training signal."
+            return f"保留 {event_name} 判定，但向球员显示注意提示。"
+        return f"{event_name} 判定足够稳定，可作为训练信号使用。"
 
     def _audit_summary(self, audit_level: str, consistency_score: float, verdict_stability: float, contradictions: List[str]) -> str:
-        contradiction_note = "no major contradictions detected" if not contradictions else f"{len(contradictions)} contradiction(s) flagged"
+        level_label = {"escalate": "升级", "watch": "观察", "clean": "正常"}.get(audit_level, audit_level)
+        contradiction_note = "未检测到重大矛盾" if not contradictions else f"标记了 {len(contradictions)} 项矛盾"
         return (
-            f"Referee audit level is {audit_level} with consistency {consistency_score:.2f} and verdict stability {verdict_stability:.2f}; "
-            f"{contradiction_note}."
+            f"裁判审计级别为{level_label}，一致性 {consistency_score:.2f}，判定稳定性 {verdict_stability:.2f}；"
+            f"{contradiction_note}。"
         )

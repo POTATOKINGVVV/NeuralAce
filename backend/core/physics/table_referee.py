@@ -344,10 +344,10 @@ class TableTennisReferee:
                 winner = "B" if faulting == "A" else "A"
                 return (
                     "FAULT",
-                    f"Ball landed out of bounds after last valid bounce on side {faulting}.",
+                    f"球在 {faulting} 侧最后一次有效弹跳后落到界外。",
                     winner,
                 )
-            return ("FAULT", "Ball landed out of bounds with no valid table bounce.", None)
+            return ("FAULT", "球落到界外，无有效台面弹跳。", None)
 
         # --- Double-bounce detection ---
         for i in range(1, len(in_bounds)):
@@ -358,9 +358,9 @@ class TableTennisReferee:
                 return (
                     result,
                     (
-                        f"Double bounce detected on side {double_side} "
-                        f"(frames {in_bounds[i - 1].frame_index} → {in_bounds[i].frame_index}). "
-                        f"Side {winner} wins the point."
+                        f"{double_side} 侧检测到二次弹跳"
+                        f"（帧 {in_bounds[i - 1].frame_index} → {in_bounds[i].frame_index}）。"
+                        f"{winner} 侧得分。"
                     ),
                     winner,
                 )
@@ -369,12 +369,12 @@ class TableTennisReferee:
         if len(in_bounds) >= 2:
             return (
                 "UNKNOWN",
-                f"Rally appears valid with {len(in_bounds)} alternating bounces; "
-                "no conclusive point scored yet.",
+                f"回合有效，共 {len(in_bounds)} 次交替弹跳；"
+                "尚未有明确得分。",
                 None,
             )
 
-        return ("UNKNOWN", "Not enough bounce data to make a call.", None)
+        return ("UNKNOWN", "弹跳数据不足，无法做出判定。", None)
 
     def _infer_last_hitter(self, bounces: List[BounceEvent]) -> str:
         """Infer who hit last based on the last in-bounds bounce side.
@@ -470,7 +470,7 @@ class TableTennisReferee:
         return {
             "auto_result": "UNKNOWN",
             "referee_confidence": 0.15,
-            "referee_reason": "Not enough bounces detected to evaluate the rally.",
+            "referee_reason": "检测到的弹跳不足，无法评估回合。",
             "bounces": [be.to_dict() for be in bounces],
             "bounce_count": len(bounces),
             "court_context": "unknown",

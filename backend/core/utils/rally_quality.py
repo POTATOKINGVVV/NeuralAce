@@ -34,11 +34,11 @@ class RallyQualityAnalyzer:
 
         warnings = []
         if signal_integrity < 0.42:
-            warnings.append("Trajectory signal is fragmented, so downstream reasoning may be less stable.")
+            warnings.append("轨迹信号不完整，下游推理可能不够稳定。")
         if referee_confidence < 0.4:
-            warnings.append("Referee confidence is limited; outcome interpretation should be treated cautiously.")
+            warnings.append("裁判置信度有限，结果解读应谨慎对待。")
         if motion_profile.get("quality_label") == "unavailable":
-            warnings.append("Pose evidence is weak, so motion scoring is partially unavailable.")
+            warnings.append("姿态证据较弱，动作评分部分不可用。")
 
         return {
             "signal_integrity": round(signal_integrity, 3),

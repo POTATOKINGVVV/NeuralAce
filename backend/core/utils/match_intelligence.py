@@ -13,9 +13,9 @@ class MatchIntelligenceAnalyzer:
         if not timeline:
             return {
                 "match_type": match_type,
-                "dominant_pattern": "unavailable",
+                "dominant_pattern": "不可用",
                 "momentum_state": "neutral",
-                "tactical_identity": "unavailable",
+                "tactical_identity": "不可用",
                 "confidence_trend": "flat",
                 "pressure_profile": {},
                 "event_distribution": {},
@@ -25,20 +25,20 @@ class MatchIntelligenceAnalyzer:
                 "duel_summary": duel_summary,
             }
 
-        events = [item.get("physics", {}).get("event", "Unknown") for item in timeline]
+        events = [item.get("physics", {}).get("event", "未知") for item in timeline]
         results = [item.get("auto_result", "UNKNOWN") for item in timeline]
         pressure_values = [float(item.get("physics", {}).get("pressure_index", 0.0) or 0.0) for item in timeline]
         confidence_values = [float(item.get("physics", {}).get("referee_confidence", 0.0) or 0.0) for item in timeline]
         tactic_names = [
-            item.get("tactics", [{}])[0].get("name", "None")
+            item.get("tactics", [{}])[0].get("name", "无")
             for item in timeline
             if item.get("tactics")
         ]
 
         event_distribution = dict(Counter(events))
         tactic_distribution = dict(Counter(tactic_names))
-        dominant_pattern = max(event_distribution, key=event_distribution.get) if event_distribution else "Unknown"
-        tactical_identity = max(tactic_distribution, key=tactic_distribution.get) if tactic_distribution else "Adaptive"
+        dominant_pattern = max(event_distribution, key=event_distribution.get) if event_distribution else "未知"
+        tactical_identity = max(tactic_distribution, key=tactic_distribution.get) if tactic_distribution else "自适应"
         win_count = sum(1 for result in results if result == "WIN")
         loss_count = sum(1 for result in results if result == "LOSS")
         momentum_state = self._momentum_state(results)
@@ -119,19 +119,19 @@ class MatchIntelligenceAnalyzer:
     ) -> List[str]:
         focus = []
         if mean_pressure >= 0.62:
-            focus.append("stabilize-pressure-management")
-        if dominant_pattern in {"Drive Exchange", "Fast Flat Exchange"}:
-            focus.append("improve-flat-exchange-control")
-        if tactical_identity in {"Counter Block", "Straight Relief Clear"}:
-            focus.append("build-transition-defense")
+            focus.append("稳定压力管理")
+        if dominant_pattern in {"抽球交换", "快速平抽交换", "Drive Exchange", "Fast Flat Exchange"}:
+            focus.append("提升平抽交换控制")
+        if tactical_identity in {"Counter Block", "Straight Relief Clear", "反手挡网", "直线解围高远"}:
+            focus.append("构建过渡防守")
         if momentum_state == "under-pressure" or loss_count > win_count:
-            focus.append("recover-rally-initiative")
+            focus.append("恢复回合主动权")
         if momentum_state == "surging":
-            focus.append("convert-advantage-more-efficiently")
+            focus.append("更高效地转化优势")
         if float(sequence_context.get("adaptation_score", 0.0) or 0.0) >= 0.62:
-            focus.append("consolidate-recent-adaptations")
-        if duel_summary.get("dominant_duel") and duel_summary.get("dominant_duel") != "unavailable":
-            focus.append("prepare-for-recurring-counter-duels")
+            focus.append("巩固近期适应成果")
+        if duel_summary.get("dominant_duel") and duel_summary.get("dominant_duel") not in ("unavailable", "不可用"):
+            focus.append("准备应对高频反击对抗")
         if not focus:
-            focus.append("maintain-balanced-decision-making")
+            focus.append("保持均衡决策")
         return focus

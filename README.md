@@ -314,7 +314,7 @@ NeuralAce/
 <table align="center">
   <tr>
     <td align="center" width="14%">
-      <img src="assets/pic/ui演示1.jpg" alt="赛场分析界面" width="100%" />
+      <img src="assets/pic/ui演示1.jpg" alt="物联网指挥舱" width="100%" />
     </td>
     <td align="center" width="14%">
       <img src="assets/pic/ui演示2.jpg" alt="训练状态界面" width="100%" />
@@ -326,13 +326,13 @@ NeuralAce/
       <img src="assets/pic/ui演示4.jpg" alt="回放复盘界面" width="100%" />
     </td>
     <td align="center" width="14%">
-      <img src="assets/pic/ui演示5.jpg" alt="物联网指挥舱" width="100%" />
+      <img src="assets/pic/ui演示5.jpg" alt="个人设置页面" width="100%" />
     </td>
     <td align="center" width="14%">
-      <img src="assets/pic/ui演示6.jpg" alt="进化分析界面" width="100%" />
+      <img src="assets/pic/ui演示6.jpg" alt="暗色主题1" width="100%" />
     </td>
     <td align="center" width="14%">
-      <img src="assets/pic/ui演示7.jpg" alt="个人设置界面" width="100%" />
+      <img src="assets/pic/ui演示7.jpg" alt="暗色主题2" width="100%" />
     </td>
   </tr>
 </table>

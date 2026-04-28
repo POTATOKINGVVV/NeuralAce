@@ -76,10 +76,10 @@ class BadmintonStrategy(SportStrategy):
             pipeline_status["tracking"] = "ok"
         except Exception as error:
             pipeline_status["tracking"] = "failed"
-            return make_empty_rally_response(match_type, f"Tracking failed: {error}")
+            return make_empty_rally_response(match_type, f"跟踪失败: {error}")
 
         if not trajectory or len(trajectory) < 2:
-            return make_empty_rally_response(match_type, "Tracking returned too few points to analyze the rally.")
+            return make_empty_rally_response(match_type, "跟踪返回的点太少，无法分析回合。")
 
         motion_feedback, motion_profile = self._get_pose_feedback(filepath, warnings, pipeline_status)
 
@@ -88,9 +88,9 @@ class BadmintonStrategy(SportStrategy):
             pipeline_status["physics"] = "ok"
         except Exception as error:
             pipeline_status["physics"] = "failed"
-            return make_empty_rally_response(match_type, f"Physics analysis failed: {error}")
+            return make_empty_rally_response(match_type, f"物理分析失败: {error}")
 
-        state["description"] += f" [Motion: {motion_feedback}]"
+        state["description"] += f" [动作: {motion_feedback}]"
         auto_result = state.get("auto_result", "UNKNOWN")
         rally_quality = self.rally_quality.evaluate(state, tracker_diagnostics=tracker_diagnostics, motion_profile=motion_profile)
         confidence_report = self.confidence_calibrator.calibrate(state, tracker_diagnostics=tracker_diagnostics, motion_profile=motion_profile, rally_quality=rally_quality)
@@ -135,7 +135,7 @@ class BadmintonStrategy(SportStrategy):
                     },
                 ) or {}
             except Exception as error:
-                warnings.append(f"Policy update skipped: {error}")
+                warnings.append(f"策略更新已跳过: {error}")
 
         summary = build_summary_payload(state, advice, tactics, auto_result)
         diagnostics = build_diagnostics_payload(
@@ -246,7 +246,7 @@ class BadmintonStrategy(SportStrategy):
             ret, frame0 = cap.read()
             cap.release()
             if not ret or frame0 is None:
-                warnings.append("Could not read the first frame for court detection.")
+                warnings.append("无法读取第一帧用于场地检测。")
                 if "court_detection" in pipeline_status:
                     pipeline_status["court_detection"] = "skipped"
                 return
@@ -256,7 +256,7 @@ class BadmintonStrategy(SportStrategy):
             if "court_detection" in pipeline_status:
                 pipeline_status["court_detection"] = "ok"
         except Exception as error:
-            warnings.append(f"Court detection fell back to default mapping: {error}")
+            warnings.append(f"场地检测回退到默认映射: {error}")
             if "court_detection" in pipeline_status:
                 pipeline_status["court_detection"] = "fallback"
 
@@ -265,16 +265,16 @@ class BadmintonStrategy(SportStrategy):
             pose_sequence = self.pose_analyzer.infer(filepath)
             if hasattr(self.pose_analyzer, "evaluate_motion_profile"):
                 motion_profile = self.pose_analyzer.evaluate_motion_profile(pose_sequence)
-                motion_feedback = motion_profile.get("feedback_text", "Pose analysis unavailable.")
+                motion_feedback = motion_profile.get("feedback_text", "姿态分析不可用。")
             else:
                 motion_feedback = self.pose_analyzer.evaluate_motion(pose_sequence)
                 motion_profile = {}
             pipeline_status["pose"] = "ok"
             return motion_feedback, motion_profile
         except Exception as error:
-            warnings.append(f"Pose analysis unavailable: {error}")
+            warnings.append(f"姿态分析不可用: {error}")
             pipeline_status["pose"] = "fallback"
-            return "Pose analysis unavailable.", {}
+            return "姿态分析不可用。", {}
 
     def _get_tactics(self, state: Dict, match_type: str, rally_quality: Dict, sequence_context: Dict, warnings: List[str], pipeline_status: Dict[str, str]) -> List[Dict]:
         try:
@@ -298,7 +298,7 @@ class BadmintonStrategy(SportStrategy):
             pipeline_status["retrieval"] = "ok" if tactics else "empty"
             return enrich_tactics(state, tactics)
         except Exception as error:
-            warnings.append(f"Tactical retrieval unavailable: {error}")
+            warnings.append(f"战术检索不可用: {error}")
             pipeline_status["retrieval"] = "fallback"
             return []
 
@@ -307,7 +307,7 @@ class BadmintonStrategy(SportStrategy):
             raw_advice = self.coach.generate_structured_advice(state, tactics)
             pipeline_status["coach"] = "ok"
         except Exception as error:
-            warnings.append(f"Coach generation fell back to defaults: {error}")
+            warnings.append(f"教练生成回退到默认值: {error}")
             pipeline_status["coach"] = "fallback"
             raw_advice = None
         return normalize_advice_payload(raw_advice, tactics, state)
@@ -332,9 +332,9 @@ class BadmintonStrategy(SportStrategy):
         if state["max_speed_kmh"] < 30:
             return None
 
-        motion_feedback = "Pose analysis is only computed for short rally clips."
+        motion_feedback = "姿态分析仅针对短回合片段计算。"
         motion_profile = {"quality_label": "segment-only", "readiness_score": 0.45}
-        state["description"] += f" [Motion: {motion_feedback}]"
+        state["description"] += f" [动作: {motion_feedback}]"
         auto_result = state.get("auto_result", "UNKNOWN")
         rally_quality = self.rally_quality.evaluate(state, tracker_diagnostics=tracker_diagnostics, motion_profile=motion_profile)
         confidence_report = self.confidence_calibrator.calibrate(state, tracker_diagnostics=tracker_diagnostics, motion_profile=motion_profile, rally_quality=rally_quality)
@@ -375,7 +375,7 @@ class BadmintonStrategy(SportStrategy):
                         },
                     ) or {}
                 except Exception as error:
-                    warnings.append(f"Policy update skipped: {error}")
+                    warnings.append(f"策略更新已跳过: {error}")
 
         summary = build_summary_payload(state, advice, tactics, auto_result)
         diagnostics = build_diagnostics_payload(
@@ -452,7 +452,7 @@ class TableTennisStrategy(SportStrategy):
     def process_rally(self, filepath: str, match_type: str) -> Dict:
         if self._init_error:
             print(f"[TT-Pipeline] ABORT: init error = {self._init_error}")
-            return make_empty_rally_response(match_type, f"Table tennis modules failed to initialize: {self._init_error}")
+            return make_empty_rally_response(match_type, f"乒乓球模块初始化失败: {self._init_error}")
 
         warnings: List[str] = []
         pipeline_status = {
@@ -468,7 +468,7 @@ class TableTennisStrategy(SportStrategy):
         if frame0 is None:
             print("[TT-Pipeline] ABORT: could not read first frame")
             pipeline_status["court_detection"] = "failed"
-            return make_empty_rally_response(match_type, "Could not read the first frame for table detection.")
+            return make_empty_rally_response(match_type, "无法读取第一帧用于球台检测。")
 
         detection = self.table_detector.detect_with_net(frame0)
         corners = detection.get("corners")
@@ -476,7 +476,7 @@ class TableTennisStrategy(SportStrategy):
         if corners is None or net_line is None:
             print(f"[TT-Pipeline] ABORT: table detection failed (corners={corners is not None}, net_line={net_line is not None})")
             pipeline_status["court_detection"] = "failed"
-            return make_empty_rally_response(match_type, "Table detection failed to provide valid corners/net line.")
+            return make_empty_rally_response(match_type, "球台检测未能提供有效的角点/网线。")
         print(f"[TT-Pipeline] Table detected OK, corners shape={corners.shape}")
         pipeline_status["court_detection"] = "ok"
 
@@ -487,21 +487,21 @@ class TableTennisStrategy(SportStrategy):
         except Exception as error:
             print(f"[TT-Pipeline] ABORT: tracking exception = {error}")
             pipeline_status["tracking"] = "failed"
-            return make_empty_rally_response(match_type, f"Table-tennis tracking failed: {error}")
+            return make_empty_rally_response(match_type, f"乒乓球跟踪失败: {error}")
 
         visible = sum(1 for x, y in trajectory if x > 0 or y > 0)
         print(f"[TT-Pipeline] Tracking OK: {len(trajectory)} frames, {visible} visible, fps={fps}")
 
         if not trajectory or len(trajectory) < 2:
             print("[TT-Pipeline] ABORT: trajectory too short")
-            return make_empty_rally_response(match_type, "Tracking returned too few points to analyze the rally.")
+            return make_empty_rally_response(match_type, "跟踪返回的点太少，无法分析回合。")
 
         try:
             state = self._build_state(trajectory, fps, corners, net_line, match_type)
             pipeline_status["physics"] = "ok"
         except Exception as error:
             pipeline_status["physics"] = "failed"
-            return make_empty_rally_response(match_type, f"Table-tennis referee analysis failed: {error}")
+            return make_empty_rally_response(match_type, f"乒乓球裁判分析失败: {error}")
 
         tactics = self._get_tactics(state, match_type, warnings, pipeline_status)
         advice = self._get_advice(state, tactics, warnings, pipeline_status)
@@ -537,13 +537,13 @@ class TableTennisStrategy(SportStrategy):
                     sport_type="table_tennis",
                 ) or {}
             except Exception as error:
-                warnings.append(f"Policy update skipped: {error}")
+                warnings.append(f"策略更新已跳过: {error}")
 
         summary = build_summary_payload(state, advice, tactics, auto_result)
         diagnostics = build_diagnostics_payload(
             warnings=warnings,
             pipeline_status=pipeline_status,
-            motion_feedback="Pose analysis is currently disabled for table tennis strategy.",
+            motion_feedback="姿态分析当前在乒乓球策略中未启用。",
             trajectory_points=len(state.get("coordinates", [])),
             tactics=tactics,
             state=state,
@@ -623,8 +623,8 @@ class TableTennisStrategy(SportStrategy):
             "shot_shape": self._classify_shot_shape(valid_points, bounce_count),
             "last_bounce_side": self._last_bounce_side(referee_state),
             "description": (
-                f"Detected {bounce_count} bounces with auto result {referee_state.get('auto_result', 'UNKNOWN')} "
-                f"on a table_tennis rally."
+                f"\u68c0\u6d4b\u5230 {bounce_count} \u6b21\u5f39\u8df3\uff0c\u81ea\u52a8\u7ed3\u679c\u4e3a {referee_state.get('auto_result', 'UNKNOWN')}\uff0c"
+                f"\u4e52\u4e53\u7403\u56de\u5408\u3002"
             ),
         }
         return state
@@ -766,18 +766,18 @@ class TableTennisStrategy(SportStrategy):
         if bounce_count <= 2 and len(bounces) >= 1:
             first_conf = bounces[0].get("confidence", 0) if bounces else 0
             if first_conf > 0.4:
-                return "Serve & Attack"
+                return "发球抢攻"
 
         if max_spd >= 70 and auto_result in ("WIN", "LOSS", "FAULT"):
-            return "Fast Attack Winner"
+            return "快攻得分"
 
         if bounce_count >= 4:
-            return "Extended Rally"
+            return "多拍相持"
 
         if mean_spd < 25 and bounce_count <= 3:
-            return "Short Control"
+            return "短球控制"
 
-        return "Table Tennis Rally"
+        return "乒乓球回合"
 
     @staticmethod
     def _last_bounce_side(state: Dict) -> str:
@@ -810,7 +810,7 @@ class TableTennisStrategy(SportStrategy):
             pipeline_status["retrieval"] = "ok" if tactics else "empty"
             return enrich_tactics(state, tactics)
         except Exception as error:
-            warnings.append(f"Tactical retrieval unavailable: {error}")
+            warnings.append(f"战术检索不可用: {error}")
             pipeline_status["retrieval"] = "fallback"
             return []
 
@@ -823,7 +823,7 @@ class TableTennisStrategy(SportStrategy):
             )
             pipeline_status["coach"] = "ok"
         except Exception as error:
-            warnings.append(f"Coach generation fell back to defaults: {error}")
+            warnings.append(f"教练生成回退到默认值: {error}")
             pipeline_status["coach"] = "fallback"
             raw_advice = self.coach._fallback_payload(state, tactics, sport_type="table_tennis")
         return normalize_advice_payload(raw_advice, tactics, state)

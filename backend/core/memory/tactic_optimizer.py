@@ -31,7 +31,7 @@ class RetrievalContextProfile:
 class TacticOptimizer:
     def build_context_profile(self, context: Dict) -> RetrievalContextProfile:
         return RetrievalContextProfile(
-            event=context.get("event") or "Unknown",
+            event=context.get("event") or "未知",
             speed=float(context.get("max_speed_kmh", 0.0) or 0.0),
             match_type=context.get("match_type") or "singles",
             court_context=context.get("court_context") or "unknown",
@@ -128,9 +128,10 @@ class TacticOptimizer:
             beta_val *= 0.96
 
         adaptation_level = "strong" if effective_weight >= 0.82 else ("moderate" if effective_weight >= 0.58 else "conservative")
+        delta_label = {"alpha": "\u6b63\u5411\u53c2\u6570", "beta": "\u8d1f\u5411\u53c2\u6570"}.get(delta_target, delta_target)
         reason = (
-            f"Updated {delta_target} with certainty {certainty_weight:.2f}, retrieval {retrieval_weight:.2f}, "
-            f"context {contextual_weight:.2f}, adaptation temperature {adaptation_temperature:.2f}, and risk guard {risk_guard:.2f}."
+            f"\u5df2\u66f4\u65b0{delta_label}\uff0c\u786e\u5b9a\u6027 {certainty_weight:.2f}\uff0c\u68c0\u7d22 {retrieval_weight:.2f}\uff0c"
+            f"\u4e0a\u4e0b\u6587 {contextual_weight:.2f}\uff0c\u9002\u5e94\u6e29\u5ea6 {adaptation_temperature:.2f}\uff0c\u98ce\u9669\u62a4\u680f {risk_guard:.2f}\u3002"
         )
 
         return {

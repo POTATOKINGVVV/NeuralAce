@@ -51,21 +51,21 @@ class PhysicsEngine:
         match_result = match_details.get('auto_result', 'UNKNOWN')
         event_name = self._classify_event(trajectory_features)
 
-        mode_label = "Singles" if match_type == "singles" else "Doubles"
-        description_parts = [f"Mode: {mode_label}.", f"Event: {event_name}."]
+        mode_label = "单打" if match_type == "singles" else "双打"
+        description_parts = [f"模式: {mode_label}。", f"事件: {event_name}。"]
         if max_speed_kmh > 0:
-            description_parts.append(f"Max shuttle speed {int(max_speed_kmh)} km/h.")
+            description_parts.append(f"最高球速 {int(max_speed_kmh)} km/h。")
         if match_result == "WIN":
-            description_parts.append("Verdict: point won.")
+            description_parts.append("判定: 得分。")
         elif match_result == "LOSS":
-            description_parts.append("Verdict: point lost.")
+            description_parts.append("判定: 失分。")
         else:
-            description_parts.append("Verdict: unresolved call.")
+            description_parts.append("判定: 未确定。")
         description_parts.append(
-            f"Phase {trajectory_features.get('attack_phase', 'neutral')}, tempo {trajectory_features.get('tempo_profile', 'medium')}, shot shape {trajectory_features.get('shot_shape', 'balanced-rally')}."
+            f"阶段 {trajectory_features.get('attack_phase', 'neutral')}，节奏 {trajectory_features.get('tempo_profile', 'medium')}，击球形态 {trajectory_features.get('shot_shape', 'balanced-rally')}。"
         )
         description_parts.append(
-            f"Referee confidence {match_details.get('referee_confidence', 0.0):.2f}; trajectory quality {trajectory_quality:.2f}; pressure index {pressure_index:.2f}."
+            f"裁判置信度 {match_details.get('referee_confidence', 0.0):.2f}；轨迹质量 {trajectory_quality:.2f}；压力指数 {pressure_index:.2f}。"
         )
 
         rally_state = {
@@ -142,15 +142,15 @@ class PhysicsEngine:
         terminal_settle = float(trajectory_features.get('terminal_settle', 0.0) or 0.0)
 
         if max_speed_kmh >= 190 and depth_span_ratio >= 0.4:
-            return "Power Smash"
+            return "重力杀球"
         if max_speed_kmh >= 150 and shot_shape == 'direct-pressure':
-            return "Steep Smash"
+            return "陡压杀球"
         if mean_speed_kmh >= 95 and lateral_span_ratio < 0.35:
-            return "Fast Flat Exchange"
+            return "快速平抽交换"
         if mean_speed_kmh >= 78:
-            return "Drive Exchange"
+            return "抽球交换"
         if shot_shape == 'soft-control' and terminal_settle >= 0.48:
-            return "Net Control"
+            return "网前控制"
         if pressure_index >= 0.58:
-            return "Pressure Rally"
-        return "Control Rally"
+            return "压力回合"
+        return "控制回合"

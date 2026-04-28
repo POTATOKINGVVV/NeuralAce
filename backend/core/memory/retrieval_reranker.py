@@ -5,6 +5,8 @@ from typing import Dict, List
 
 import numpy as np
 
+from core.utils.label_zh import zh_phase, zh_style, zh_policy
+
 
 class RetrievalReranker:
     def rerank(self, candidates: List[Dict], context: Dict | None = None, scenario_summary: Dict | None = None, top_k: int | None = None) -> List[Dict]:
@@ -139,20 +141,20 @@ class RetrievalReranker:
         volatility_guard: float,
         scenario_summary: Dict,
     ) -> str:
-        tactic_name = candidate.get("name", metadata.get("name", "This tactic"))
+        tactic_name = candidate.get("name", metadata.get("name", "该战术"))
         policy_mode = (candidate.get("scheduler_profile", {}) or {}).get("policy_mode", "balanced")
         familiarity = float(scenario_summary.get("familiarity", 0.0) or 0.0)
         return (
-            f"{tactic_name} stayed near the top because continuity scored {continuity_score:.2f}, coverage scored {coverage_score:.2f}, "
-            f"and the volatility guard held at {volatility_guard:.2f}. Policy mode is {policy_mode} with scenario familiarity {familiarity:.2f}."
+            f"{tactic_name} 保持领先，因为连贯性得分 {continuity_score:.2f}，覆盖度得分 {coverage_score:.2f}，"
+            f"波动性防护保持在 {volatility_guard:.2f}。策略模式为 {zh_policy(policy_mode)}，场景熟悉度 {familiarity:.2f}。"
         )
 
     def _frontier_hint(self, metadata: Dict, context: Dict, scenario_summary: Dict, volatility_guard: float) -> str:
         familiarity = float(scenario_summary.get("familiarity", 0.0) or 0.0)
-        attack_phase = context.get("attack_phase", "neutral").replace("_", " ")
-        style_family = metadata.get("style_family", "balanced").replace("-", " ")
+        attack_phase = zh_phase(context.get("attack_phase", "neutral"))
+        style_family = zh_style(metadata.get("style_family", "balanced"))
         if familiarity < 0.25:
-            return f"Use this as an exploratory {style_family} branch while the {attack_phase} scenario is still under-sampled."
+            return f"在 {attack_phase} 场景仍缺乏样本时，将此作为 {style_family} 的探索性分支使用。"
         if volatility_guard < 0.55:
-            return f"Keep this branch on a short leash in {attack_phase} exchanges because the volatility guard is still fragile."
-        return f"This {style_family} branch is stable enough to keep reinforcing in {attack_phase} exchanges."
+            return f"在 {attack_phase} 交换中保持该分支的谨慎使用，因为波动性防护仍然脆弱。"
+        return f"该 {style_family} 分支足够稳定，可以在 {attack_phase} 交换中继续强化。"

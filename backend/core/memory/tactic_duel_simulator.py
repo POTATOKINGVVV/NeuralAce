@@ -5,6 +5,8 @@ from typing import Dict, List
 
 import numpy as np
 
+from core.utils.label_zh import zh_phase
+
 
 COUNTER_FAMILY_MAP = {
     "absorb-and-redirect": ["compression-attack", "front-court-trap"],
@@ -31,7 +33,7 @@ class TacticDuelSimulator:
         primary = tactics[0]
         metadata = primary.get("metadata", {}) or {}
         primary_family = metadata.get("style_family", "balanced")
-        primary_name = primary.get("name", "Neutral reset")
+        primary_name = primary.get("name", "中性重置")
         primary_phase = state.get("attack_phase", "neutral")
         likely_response = self._likely_response(primary_family, primary_phase, sequence_context)
         counter_tactics = self._counter_tactics(primary, state, sequence_context)
@@ -57,7 +59,7 @@ class TacticDuelSimulator:
         sequence_context = sequence_context or {}
         if not timeline:
             return {
-                "dominant_duel": "unavailable",
+                "dominant_duel": "不可用",
                 "recurring_counters": [],
                 "duel_risk_profile": {},
                 "duel_cards": [],
@@ -67,22 +69,22 @@ class TacticDuelSimulator:
         duel_items = [item for item in duel_items if item]
         if not duel_items:
             return {
-                "dominant_duel": "unavailable",
+                "dominant_duel": "不可用",
                 "recurring_counters": [],
                 "duel_risk_profile": {},
                 "duel_cards": [],
             }
 
-        pair_counter = Counter(f"{item.get('primary_plan', 'Unknown')} -> {item.get('likely_response', 'Unknown')}" for item in duel_items)
-        response_counter = Counter(item.get("likely_response", "Unknown") for item in duel_items)
+        pair_counter = Counter(f"{item.get('primary_plan', '未知')} -> {item.get('likely_response', '未知')}" for item in duel_items)
+        response_counter = Counter(item.get("likely_response", "未知") for item in duel_items)
         duel_risks = [float(item.get("duel_risk", 0.0) or 0.0) for item in duel_items]
-        dominant_duel = pair_counter.most_common(1)[0][0] if pair_counter else "unavailable"
+        dominant_duel = pair_counter.most_common(1)[0][0] if pair_counter else "不可用"
         recurring_counters = [{"name": name, "count": count} for name, count in response_counter.most_common(3)]
         duel_cards = []
         for item in duel_items[:3]:
             duel_cards.append(
                 {
-                    "title": item.get("primary_plan", "Unknown"),
+                    "title": item.get("primary_plan", "未知"),
                     "body": item.get("duel_explanation", ""),
                     "risk": item.get("duel_risk_label", "medium"),
                 }
@@ -108,14 +110,14 @@ class TacticDuelSimulator:
     def _likely_response(self, primary_family: str, primary_phase: str, sequence_context: Dict) -> str:
         pressure_label = (sequence_context.get("pressure_swing", {}) or {}).get("label", "steady-pressure")
         if primary_phase == "advantage":
-            return "The opponent is likely to defend compactly and look for a straight reset window."
+            return "对手可能会紧凑防守，寻找直线重置的窗口。"
         if primary_phase == "under_pressure":
-            return "The opponent is likely to accelerate the next neutral ball and deny your recovery time."
+            return "对手可能会加速下一个中性球，压缩你的恢复时间。"
         if pressure_label == "rising-pressure":
-            return "The opponent is likely to shorten the exchange and attack the first loose reply."
+            return "对手可能会缩短交换并攻击第一个松动的回球。"
         if primary_family == "deception":
-            return "The opponent is likely to hold their base and delay commitment to the first fake cue."
-        return "The opponent is likely to answer with a stabilizing shot and wait for overcommitment."
+            return "对手可能会稳住重心，延迟对第一个假动作的反应。"
+        return "对手可能会用稳定球应对，等待你过度投入的机会。"
 
     def _counter_tactics(self, primary: Dict, state: Dict, sequence_context: Dict) -> List[Dict]:
         metadata = primary.get("metadata", {}) or {}
@@ -127,7 +129,7 @@ class TacticDuelSimulator:
                 fit_score = self._counter_fit(seed, state, sequence_context)
                 counters.append(
                     {
-                        "name": seed.get("name", "Unknown"),
+                        "name": seed.get("name", "未知"),
                         "family": family,
                         "fit_score": round(fit_score, 3),
                         "reason": self._counter_reason(seed, state),
@@ -138,7 +140,7 @@ class TacticDuelSimulator:
 
     def _counter_fit(self, seed: Dict, state: Dict, sequence_context: Dict) -> float:
         phase = state.get("attack_phase", "neutral")
-        event = state.get("event", "Unknown")
+        event = state.get("event", "未知")
         preferred_style = sequence_context.get("preferred_style_family", "balanced")
         phase_fit = 1.0 if seed.get("phase_preference") == phase else 0.62
         event_fit = 1.0 if event in seed.get("applicable_events", []) else 0.54
@@ -148,8 +150,8 @@ class TacticDuelSimulator:
 
     def _counter_reason(self, seed: Dict, state: Dict) -> str:
         return (
-            f"{seed.get('name', 'This tactic')} fits {state.get('attack_phase', 'neutral').replace('_', ' ')} exchanges "
-            f"and can answer {state.get('event', 'the current rally').lower()} patterns without fully mirroring them."
+            f"{seed.get('name', '该战术')} 适合 {zh_phase(state.get('attack_phase', 'neutral'))} 交换，"
+            f"可以应对 {state.get('event', '当前回合')} 模式而不完全镜像对方。"
         )
 
     def _duel_risk(self, primary: Dict, state: Dict, sequence_context: Dict) -> float:
@@ -180,32 +182,34 @@ class TacticDuelSimulator:
         return "extended-exchange"
 
     def _exchange_script(self, primary_name: str, likely_response: str, counter_tactics: List[Dict], primary_phase: str) -> List[str]:
-        script = [f"Open with {primary_name} from a {primary_phase.replace('_', ' ')} position.", likely_response]
+        script = [f"从 {zh_phase(primary_phase)} 位置以 {primary_name} 开局。", likely_response]
         if counter_tactics:
-            script.append(f"If the exchange turns, the cleanest counter lane is {counter_tactics[0].get('name', 'Unknown')}.")
+            script.append(f"如果交换转向，最佳反击路线是 {counter_tactics[0].get('name', '未知')}。")
         return script
 
     def _duel_explanation(self, primary_name: str, likely_response: str, duel_risk_label: str, sequence_context: Dict) -> str:
-        memory_summary = sequence_context.get("memory_summary", "Sequence memory is limited.")
-        return f"{primary_name} enters a {duel_risk_label}-risk duel. {likely_response} Sequence memory adds this context: {memory_summary}"
+        risk_map = {"high": "高", "medium": "中", "low": "低"}
+        risk_cn = risk_map.get(duel_risk_label, "中")
+        memory_summary = sequence_context.get("memory_summary", "序列记忆有限。")
+        return f"{primary_name} 进入{risk_cn}风险对抗。{likely_response} 序列记忆补充：{memory_summary}"
 
     def _pressure_gate(self, state: Dict, duel_risk: float) -> str:
         pressure = float(state.get("pressure_index", 0.5) or 0.5)
         if duel_risk >= 0.72 or pressure >= 0.74:
-            return "Only take this duel if preparation starts early."
+            return "仅在提前准备充分时才应进入该对抗。"
         if duel_risk >= 0.48:
-            return "Take the duel only when the base remains balanced after the first contact."
-        return "The duel is stable enough to keep applying pressure through the next exchange."
+            return "仅在第一拍接触后重心仍稳定时才应进入对抗。"
+        return "对抗足够稳定，可以在下一次交换中继续施压。"
 
     def _empty_projection(self) -> Dict:
         return {
-            "primary_plan": "Neutral reset",
-            "likely_response": "No duel projection is available.",
+            "primary_plan": "中性重置",
+            "likely_response": "暂无对抗推演。",
             "counter_window": "unknown",
             "duel_risk": 0.0,
             "duel_risk_label": "low",
             "counter_tactics": [],
             "exchange_script": [],
-            "duel_explanation": "No tactics were available, so no duel projection could be built.",
-            "pressure_gate": "Stabilize the rally first.",
+            "duel_explanation": "没有可用战术，无法生成对抗推演。",
+            "pressure_gate": "先稳定回合节奏。",
         }

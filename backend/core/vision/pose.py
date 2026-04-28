@@ -32,7 +32,7 @@ class PoseAnalyzer:
         return pose_sequence
 
     def evaluate_motion(self, pose_seq):
-        return self.evaluate_motion_profile(pose_seq).get("feedback_text", "No reliable body motion was detected.")
+        return self.evaluate_motion_profile(pose_seq).get("feedback_text", "未检测到可靠的身体动作。")
 
     def evaluate_motion_profile(self, pose_seq):
         knee_angles = []
@@ -53,7 +53,7 @@ class PoseAnalyzer:
         valid_mask = ~np.isnan(knee_angles)
         if valid_mask.sum() < 5:
             profile = self.motion_scorer.score(pose_seq, knee_angles, arm_angles)
-            profile["feedback_text"] = "No reliable body motion was detected."
+            profile["feedback_text"] = "未检测到可靠的身体动作。"
             return profile
 
         knee_valid = knee_angles[valid_mask]
@@ -69,16 +69,16 @@ class PoseAnalyzer:
 
         feedback = []
         if min_knee > 135:
-            feedback.append("Base stays too high. Lower earlier to improve balance on defense.")
+            feedback.append("重心偏高，建议提前降低以提高防守平衡。")
         elif min_knee < 100:
-            feedback.append("Excellent lunge depth. Center-of-mass control looks strong.")
+            feedback.append("弓步深度优秀，重心控制良好。")
         else:
-            feedback.append("Base control is solid, but there is room for a lower defensive stance.")
+            feedback.append("重心控制稳定，但防守站姿还有下降空间。")
 
         if max_arm < 150:
-            feedback.append("Arm extension is limited at contact, costing reach and power.")
+            feedback.append("击球时手臂伸展不足，影响覆盖范围和力量。")
         else:
-            feedback.append("Contact point is well extended with strong striking structure.")
+            feedback.append("击球点伸展充分，击球结构良好。")
 
         profile = self.motion_scorer.score(pose_seq, knee_angles, arm_angles)
         profile.update(

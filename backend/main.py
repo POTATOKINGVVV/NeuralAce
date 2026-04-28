@@ -52,18 +52,18 @@ ALLOWED_VIDEO_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv", ".webm"}
 
 def validate_match_type(match_type: str) -> str:
     if match_type not in {"singles", "doubles"}:
-        raise HTTPException(status_code=400, detail="match_type must be 'singles' or 'doubles'.")
+        raise HTTPException(status_code=400, detail="match_type 必须为 'singles' 或 'doubles'。")
     return match_type
 
 def validate_sport_type(sport_type: str) -> str:
     if sport_type not in {"badminton", "table_tennis"}:
-        raise HTTPException(status_code=400, detail="sport_type must be 'badminton' or 'table_tennis'.")
+        raise HTTPException(status_code=400, detail="sport_type 必须为 'badminton' 或 'table_tennis'。")
     return sport_type
 
 def validate_upload(file: UploadFile):
     suffix = os.path.splitext(file.filename or "")[1].lower()
     if suffix and suffix not in ALLOWED_VIDEO_EXTENSIONS:
-        raise HTTPException(status_code=400, detail=f"Unsupported file type: {suffix}")
+        raise HTTPException(status_code=400, detail=f"不支持的文件类型: {suffix}")
 
 
 @app.get("/")

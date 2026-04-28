@@ -37,5 +37,20 @@
     "preferred_tactics": {
       "T001": 1
     }
+  },
+  "doubles|多拍相持|neutral|out_of_bounds": {
+    "wins": 0,
+    "losses": 0,
+    "preferred_tactics": {
+      "TT006": 1
+    }
+  },
+  "doubles|控制回合|neutral|rear_channel": {
+    "wins": 0,
+    "losses": 2,
+    "preferred_tactics": {
+      "T008": 1,
+      "T002": 1
+    }
   }
 }

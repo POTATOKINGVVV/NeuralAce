@@ -4,6 +4,8 @@ from typing import Dict, List
 
 import numpy as np
 
+from core.utils.label_zh import zh_phase, zh_style, zh_policy, zh_strategy
+
 
 class TacticEvolutionReplayer:
     def build_candidate_replays(self, candidates: List[Dict], context: Dict | None = None, scenario_summary: Dict | None = None) -> List[Dict]:
@@ -45,9 +47,11 @@ class TacticEvolutionReplayer:
             0.0,
             1.25,
         ))
+        direction_label = {"reinforce": "强化", "cooldown": "冷却"}.get(direction, direction)
+        level_label = {"strong": "强", "moderate": "中", "conservative": "保守"}.get(adaptation_level, adaptation_level)
         summary = (
-            f"{tactic_label} entered a {direction} cycle with weighted increment {weighted_increment:.2f}, "
-            f"certainty weight {certainty_weight:.2f}, and adaptation level {adaptation_level}."
+            f"{tactic_label} 进入{direction_label}周期，加权增量 {weighted_increment:.2f}，"
+            f"确定性权重 {certainty_weight:.2f}，适应级别{level_label}。"
         )
 
         return {
@@ -125,50 +129,51 @@ class TacticEvolutionReplayer:
     def _training_block(self, context: Dict, risk_level: str, style_family: str) -> str:
         attack_phase = context.get("attack_phase", "neutral")
         if attack_phase == "under_pressure":
-            return "pressure absorb + counter release"
+            return "压力吸收 + 反击释放"
         if risk_level == "high":
-            return f"early preparation for {style_family} commitment"
+            return f"提前为 {zh_style(style_family)} 投入做准备"
         if attack_phase == "advantage":
-            return "finish the rally on the first clean window"
-        return "tempo control and shape preservation"
+            return "在第一个干净窗口结束回合"
+        return "节奏控制和结构保持"
 
     def _why_now(self, candidate: Dict, context: Dict, familiarity: float) -> str:
-        tactic_name = candidate.get("name", "This tactic")
-        phase = context.get("attack_phase", "neutral").replace("_", " ")
+        tactic_name = candidate.get("name", "该战术")
+        phase = zh_phase(context.get("attack_phase", "neutral"))
         score = float(candidate.get("rerank_score", candidate.get("score", 0.0)) or 0.0)
         if familiarity < 0.25:
-            return f"{tactic_name} is worth probing now because the {phase} branch is still under-learned and the current score is {score:.2f}."
-        return f"{tactic_name} is relevant now because it preserved strong rank value at {score:.2f} in a {phase} exchange."
+            return f"{tactic_name} 值得现在探索，因为 {phase} 分支仍未充分学习，当前得分 {score:.2f}。"
+        return f"{tactic_name} 现在很合适，因为它在 {phase} 交换中保持了 {score:.2f} 的强排名值。"
 
     def _candidate_upgrade_path(self, candidate: Dict, context: Dict, policy_mode: str) -> List[str]:
-        phase = context.get("attack_phase", "neutral").replace("_", " ")
-        tactic_name = candidate.get("name", "This tactic")
+        phase = zh_phase(context.get("attack_phase", "neutral"))
+        tactic_name = candidate.get("name", "该战术")
         steps = [
-            f"Rehearse {tactic_name} entries from {phase} situations.",
-            "Track whether the first attacking touch creates space or panic.",
+            f"从 {phase} 情景演练 {tactic_name} 的进入方式。",
+            "跟踪第一次进攻触球是创造了空间还是引发了混乱。",
         ]
         if policy_mode == "explore":
-            steps.append("Keep the sample size broad before narrowing into a fixed preference.")
+            steps.append("在确定固定偏好之前保持广泛的样本量。")
         else:
-            steps.append("Reinforce the most repeatable variation and trim noisy branches.")
+            steps.append("强化最可重复的变体，剪除噪声分支。")
         return steps
 
     def _frontier_hint(self, rank: int, development_stage: str, frontier_summary: Dict, risk_level: str) -> str:
         frontier_shape = frontier_summary.get("frontier_shape", "layered")
+        shape_label = {"sharp": "尖锐", "open": "开放", "layered": "分层"}.get(frontier_shape, frontier_shape)
         if development_stage == "weaponize":
-            return f"Frontier is {frontier_shape}; this branch can be hardened into a primary scoring pattern."
+            return f"前沿为{shape_label}；该分支可以固化为主要得分模式。"
         if risk_level == "high":
-            return f"Frontier is {frontier_shape}; keep this branch as a selective weapon rather than a default habit."
+            return f"前沿为{shape_label}；将该分支作为选择性武器而非默认习惯。"
         if rank > 1:
-            return f"Frontier is {frontier_shape}; keep this branch alive as a secondary lane for variation."
-        return f"Frontier is {frontier_shape}; continue refining this branch before expanding sideways."
+            return f"前沿为{shape_label}；保持该分支作为变化的备用通道。"
+        return f"前沿为{shape_label}；在横向扩展前继续精炼该分支。"
 
     def _update_upgrade_path(self, context: Dict, update_payload: Dict) -> List[str]:
         reason = update_payload.get("policy_update_reason", "")
         strategy_tag = update_payload.get("strategy_tag", "adapt")
-        phase = context.get("attack_phase", "neutral").replace("_", " ")
+        phase = zh_phase(context.get("attack_phase", "neutral"))
         return [
-            f"Use {strategy_tag} as the next adjustment frame for {phase} rallies.",
-            reason or "Preserve only the stable branch of the tactic after this update.",
-            "Re-check whether the tactic still fits the same court context after the next few rallies.",
+            f"将 {zh_strategy(strategy_tag)} 作为 {phase} 回合的下一个调整框架。",
+            reason or "本次更新后仅保留战术的稳定分支。",
+            "在接下来几个回合后重新检查该战术是否仍然适合相同的场地上下文。",
         ]

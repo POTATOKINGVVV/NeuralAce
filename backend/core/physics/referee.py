@@ -32,7 +32,7 @@ class AutoReferee:
             return {
                 'auto_result': 'UNKNOWN',
                 'referee_confidence': 0.2,
-                'referee_reason': 'Not enough valid trajectory points for a reliable call.',
+                'referee_reason': '有效轨迹点不足，无法做出可靠判定。',
                 'landing_confidence': 0.2,
                 'direction_consistency': 0.2,
                 'landing_margin': 0.0,
@@ -74,18 +74,19 @@ class AutoReferee:
         if referee_confidence < 0.33:
             auto_result = 'UNKNOWN'
             referee_reason = (
-                f'Landing evidence is weak for a {match_type} call. '
-                f'Direction consistency {direction_consistency:.2f}, landing confidence {landing_confidence:.2f}.'
+                f'{match_type} 模式下落点证据不足。'
+                f'方向一致性 {direction_consistency:.2f}，落点置信度 {landing_confidence:.2f}。'
             )
         else:
             if last_hitter == 'USER':
                 auto_result = 'WIN' if is_in else 'LOSS'
             else:
                 auto_result = 'LOSS' if is_in else 'WIN'
-            verdict = 'in' if is_in else 'out'
+            hitter_label = '己方' if last_hitter == 'USER' else '对方'
+            verdict = '界内' if is_in else '界外'
             referee_reason = (
-                f'Last hitter inferred as {last_hitter.lower()} with {direction_consistency:.2f} direction consistency; '
-                f'landing appears {verdict} with a court margin of {landing_margin:.2f} m and terminal settle {settle_bonus:.2f}.'
+                f'推断最后击球方为{hitter_label}，方向一致性 {direction_consistency:.2f}；'
+                f'落点判断为{verdict}，距界距离 {landing_margin:.2f} 米，末端稳定度 {settle_bonus:.2f}。'
             )
 
         return {
