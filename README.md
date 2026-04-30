@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/pic/logo-banner.svg" alt="NeuralAce Banner Logo" width="780" />
+
 
 ### 智能羽毛球训练分析与物联网感知平台
 
